@@ -1,2 +1,2 @@
 # mojohand
-Bio tools
+Bio tools. Hello world.
