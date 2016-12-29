@@ -14,5 +14,10 @@ public class TalenDesTest extends Assert{
         assertEquals("", Talendesign.reverseComplement(""));
         assertEquals("[atcgcgcg]", Talendesign.reverseComplement("[cgcgcgat]"));
     }
-    
+
+    @Test
+    public void dnaRvdTest(){
+        assertEquals("HDNNNING", Talendesign.dnaToRvd("cgat"));
+        assertEquals("", Talendesign.reverseComplement(""));
+    }
 }

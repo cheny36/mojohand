@@ -16,7 +16,7 @@ public class Talendesign {
     }
     
     /**
-     * Returns the reverse complement of a DNA sequence
+     * Produces the reverse complement of a DNA sequence
      * @param s original DNA sequence
      * @return reverse complement sequence
      */
@@ -35,6 +35,27 @@ public class Talendesign {
         
         StringBuilder x = new StringBuilder();
         for(int i = s.length()-1; i >= 0; i--){
+            x.append(key.get(s.charAt(i)));
+        }
+        return x.toString();
+    }
+    
+    /**
+     * Changes a DNA sequence into TALEN RVD sequences
+     * @param s original DNA sequence
+     * @return new RVD sequence
+     */
+    public static String dnaToRvd(String s){
+        Hashtable<Character, String> key = new Hashtable<Character, String>();
+        key.put('a', "NI");
+        key.put('t', "NG");
+        key.put('g', "NN");
+        key.put('c', "HD");
+        
+        s = s.toLowerCase();
+        
+        StringBuilder x = new StringBuilder();
+        for(int i = 0; i < s.length(); i++){
             x.append(key.get(s.charAt(i)));
         }
         return x.toString();
