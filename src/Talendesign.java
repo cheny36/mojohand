@@ -1,4 +1,6 @@
 
+import java.util.Hashtable;
+
 import com.basistech.tclre.*;
 
 public class Talendesign {
@@ -12,5 +14,29 @@ public class Talendesign {
         System.out.println(matcher.end());
         System.out.println(matcher.find());
     }
-
+    
+    /**
+     * Returns the reverse complement of a DNA sequence
+     * @param s original DNA sequence
+     * @return reverse complement sequence
+     */
+    public static String reverseComplement(String s){
+        Hashtable<Character, Character> key = new Hashtable<Character, Character>();
+        key.put('a', 't');
+        key.put('t', 'a');
+        key.put('g', 'c');
+        key.put('c', 'g');
+        key.put('[', ']');
+        key.put(']', '[');
+        key.put('.', '-');
+        key.put(',', '-');
+        
+        s = s.toLowerCase();
+        
+        StringBuilder x = new StringBuilder();
+        for(int i = s.length()-1; i >= 0; i--){
+            x.append(key.get(s.charAt(i)));
+        }
+        return x.toString();
+    }
 }
