@@ -1,6 +1,7 @@
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -27,6 +28,16 @@ public class Talendesign {
         
         ArrayList<String> Labels = new ArrayList<String>();
         ArrayList<String> Sequences = new ArrayList<String>();
+
+        String url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+                + "?db=nuccore&id=" + "NC_000002.12"
+                + "&seq_start=" + 176087486
+                + "&seq_stop=" + 176095937
+                + "&retmode=xml&strand=" + 1
+                + "&tool=tal_tool&email=" + "yi.chen901@gmail.com";
+        PrintWriter writer = new PrintWriter("temp.txt", "UTF-8");
+        writer.println(getWebContent(url, 1));
+        writer.close();
     }
     
     
@@ -109,8 +120,8 @@ public class Talendesign {
 
     /**
      * Obtain gene information from a gene ID from the ncbi database
-     * @param gene
-     * @param email
+     * @param gene NCBI geneID
+     * @param email user's email
      * @return String array containing: accession number, gene start, gene end, symbol, aka, summary
      */
     public static String[] getGeneInfo(int gene, String email){
@@ -149,6 +160,80 @@ public class Talendesign {
             System.exit(0);
             e.printStackTrace();
         }
+        if (results[0] == null ||
+                results[1] == null ||
+                results[2] == null){
+            return null;
+            //we can't continue, couldn't find gene accession or coordinates
+        }
+        return results;
+    }
+  
+    /**
+     * Obtain gene information from a accesion info from the ncbi database
+     * @param accession NCBI accession number
+     * @param geneStart start of query
+     * @param geneStop end of query
+     * @param email user's email
+     * @return String array containing: accession number, gene start, gene end, symbol, aka, summary
+     */
+    public static String[] getGeneInfo(String accession, int geneStart, int geneStop, String email){
+    //I don't know how else to pass the results other than in a String array, which seems improper
+
+        int strand = 1; //forward DNA strand
+        if(geneStart > geneStop){
+            strand = 2; //reverse DNA strand
+        }
+        
+        String url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+                + "?db=nuccore&id=" + accession
+                + "&seq_start=" + geneStart
+                + "&seq_stop=" + geneStop
+                + "&retmode=xml&strand=" + strand
+                + "&tool=tal_tool&email=" + email;
+        String geneSummary = getWebContent(url, 3);
+        BufferedReader reader = new BufferedReader(new StringReader(geneSummary));
+        String[] results = new String[6];
+        results[0] = accession;
+        results[1] = Integer.toString(geneStart);
+        results[2] = Integer.toString(geneStop);
+
+        String line;
+        try {
+            while((line = reader.readLine()) != null){
+                if (line.trim().equals("gene") && results[3] == null){
+                    /*
+                     * This xml format typically looks like:
+                     *  <GBQualifer_name>
+                     *      gene
+                     *  <\GBQualifier_name>
+                     *  <GBQualifer_value>
+                     *      'gene name'
+                     *  <\GBQualifer_value>
+                     *  
+                     *  so we skip two lines after finding the qualifier name we're looking for
+                     */
+                    
+                    if(reader.readLine().contains("Qualifier_name")){
+                        reader.readLine();
+                        results[3] = reader.readLine().trim();
+                    }
+                }
+                if (line.contains("gene_synonym") && results[4] == null){
+                    reader.readLine();
+                    reader.readLine();
+                    results[4] = reader.readLine().trim();
+                }
+                if (line.trim().equals("note") && results[5] == null){
+                    reader.readLine();
+                    reader.readLine();
+                    results[5] = reader.readLine().trim();
+                }
+            }
+        } catch (IOException e) { //failed at reading the summary file :/
+            System.exit(0);
+            e.printStackTrace();
+        }
         return results;
     }
     
@@ -157,9 +242,31 @@ public class Talendesign {
      * accession number
      * @param Labels arraylist for storing our labels
      * @param Sequences arraylist for storing our gene sequences
+     * @param email user's email
+     * @param accession NCBI gene accession number
+     * @param geneStart starting coordinates
+     * @param geneStop stopping coordinates
+     * @param type determines whether we want 0: exons; 1: introns: 2: all sequences
      */
-    public static void getSeqNCBI(ArrayList<String> Labels, ArrayList<String> Sequences){
+    public static void getSeqNCBI(ArrayList<String> Labels, 
+            ArrayList<String> Sequences,
+            String email,
+            String accession, 
+            int geneStart, 
+            int geneStop,
+            int type){
         
+        int strand = 1; //forward DNA strand
+        if(geneStart > geneStop){
+            strand = 2; //reverse DNA strand
+        }
+        
+        String url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+                + "db=nuccore&id=" + accession
+                + "&seq_start=" + geneStart
+                + "&seq_stop=" + geneStop
+                + "retmode=xml&strand=" + strand
+                + "&tool=tal_tool&email=" + email;
     }
 
 

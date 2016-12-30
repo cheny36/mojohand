@@ -32,6 +32,10 @@ public class TalenDesTest extends Assert{
         }
         System.out.println();
         System.out.println();
+        for (String result: Talendesign.getGeneInfo("NC_000002.12", 176087486, 176095937, "yi.chen901@gmail.com")){
+            System.out.println(result);
+        }
+        
     }
     
 }
