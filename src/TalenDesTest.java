@@ -20,4 +20,18 @@ public class TalenDesTest extends Assert{
         assertEquals("HDNNNING", Talendesign.dnaToRvd("cgat"));
         assertEquals("", Talendesign.reverseComplement(""));
     }
+    
+    @Test
+    public void getGeneInfoTest(){
+        //we can't check this with assert, since NCBI might update the info,
+        //which would change the values of the results; Check manually; This test
+        //also should verify that getWebContent() is also working
+        
+        for (String result: Talendesign.getGeneInfo(3239, "yi.chen901@gmail.com")){
+            System.out.println(result);
+        }
+        System.out.println();
+        System.out.println();
+    }
+    
 }
