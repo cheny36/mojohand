@@ -1,5 +1,9 @@
 
+import java.io.IOException;
 import java.util.Hashtable;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.basistech.tclre.*;
 
@@ -60,4 +64,36 @@ public class Talendesign {
         }
         return x.toString();
     }
+
+    /**
+     * Attempts to obtain a given html file within a certain amount of tries.
+     * @param url string with web address
+     * @param attempts number of tries before failure
+     * @return string containing html/css parsed web content
+     */
+    public static String getWebContent(String url, int attempts){
+        Document doc = null;
+        boolean success = true;
+        for(int i = 0; i < attempts; i++){
+            success = true;
+            try {
+                doc = Jsoup.connect(url).get();
+            } catch (IOException e) {
+                success = false;
+                e.printStackTrace();
+            } finally {
+                if (success){
+                    break;
+                }
+            }
+        }
+        if (!success){
+            System.exit(0);
+        }
+        return doc.toString();
+    }
+
+
+
+
 }
