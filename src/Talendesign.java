@@ -22,6 +22,8 @@ public class Talendesign {
 //        System.out.println(matcher.end());
 //        System.out.println(matcher.find());
         
+        String email;
+        
         String accession;
         int seqStart;
         int seqEnd;
@@ -29,15 +31,6 @@ public class Talendesign {
         ArrayList<String> Labels = new ArrayList<String>();
         ArrayList<String> Sequences = new ArrayList<String>();
 
-        String url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-                + "?db=nuccore&id=" + "NC_000002.12"
-                + "&seq_start=" + 176087486
-                + "&seq_stop=" + 176095937
-                + "&retmode=xml&strand=" + 1
-                + "&tool=tal_tool&email=" + "yi.chen901@gmail.com";
-        PrintWriter writer = new PrintWriter("temp.txt", "UTF-8");
-        writer.println(getWebContent(url, 1));
-        writer.close();
     }
     
     
@@ -170,7 +163,7 @@ public class Talendesign {
     }
   
     /**
-     * Obtain gene information from a accesion info from the ncbi database
+     * Obtain gene information from an accession code from the ncbi database
      * @param accession NCBI accession number
      * @param geneStart start of query
      * @param geneStop end of query
@@ -262,12 +255,54 @@ public class Talendesign {
         }
         
         String url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-                + "db=nuccore&id=" + accession
+                + "?db=nuccore&id=" + accession
                 + "&seq_start=" + geneStart
                 + "&seq_stop=" + geneStop
-                + "retmode=xml&strand=" + strand
+                + "&retmode=xml&strand=" + strand
                 + "&tool=tal_tool&email=" + email;
+        String geneXML = getWebContent(url, 3);
+        BufferedReader reader = new BufferedReader(new StringReader(geneXML));
+        
+        String sequence = null;
+        ArrayList<String> features = new ArrayList<String>();
+        
+        String line;
+        try {
+            while((line = reader.readLine()) != null){
+                if (line.contains("GBSeq_sequence")){
+                    sequence = reader.readLine().trim();
+                }
+                if (line.contains("GBFeature>")){
+                    String temp = "";
+                    while(!((line = reader.readLine()).contains("GBFeature>"))){
+                        temp = temp + "\n" + line;
+                    }
+                    features.add(temp);
+                }
+            }
+        } catch (IOException e) { //failed to read the XML aboooorttt
+            System.exit(0);
+            e.printStackTrace();
+        }
+        if (sequence == null){ //couldn't find the sequence
+            return;
+        }
+        
     }
-
+    
+    /**
+     * Takes a list of xml gene features and extracts the feature coordinates for the corresponding
+     * records based off key.
+     * @param features arraylist of xml files of features
+     * @param featureNames arraylist for storing feature names
+     * @param coords arraylist for storing feature coordinates
+     * @param key type of records to look for (e.g. mrna, cdna, ...)
+     */
+    public static void featureList(ArrayList<String> features, 
+            ArrayList<String> featureNames, 
+            ArrayList<int[]> coords, 
+            String key){
+        
+    }
 
 }
